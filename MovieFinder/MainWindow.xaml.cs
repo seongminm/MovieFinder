@@ -97,14 +97,21 @@ namespace MovieFinder
                 await Commons.ShowMessageAsync("TMDB API", "인증키가 필요합니다");
                 return;
             }
+            /* 인코딩 : 정보나 데이터를 특정 형식으로 변환하는 과정
+             * 대부분의 웹 브라우저나 HTTP클라이언트에서는 자동으로 인코딩을 처리하지만
+             * 명시적인 인코딩 과정을 통해 모든 상황에서 안전한 전송을 보장하기 위한 좋은 습관
+             */
             string encoding_movieName = HttpUtility.UrlEncode(movieName, Encoding.UTF8);
+            
+
             string openApiUrl = $@"https://api.themoviedb.org/3/search/movie?api_key={tmdb_apiKey}&language=ko-KR&page=1&include_adult=false&query={encoding_movieName}";
+           
             string result = string.Empty;   // 결과값
 
             // api 실행할 객체
-            WebRequest req = null;
-            WebResponse res = null;
-            StreamReader reader = null;
+            WebRequest req = null; // 웹 리소스에 대한 요청을 만들기 위한 추상클래스
+            WebResponse res = null; // 웹 리소스에 대한 요청을 나타내는 추상클래스
+            StreamReader reader = null; //텍스트 데이터를 읽기 위한 기능을 제공
 
             // API 요청
             try
@@ -114,7 +121,7 @@ namespace MovieFinder
                 reader = new StreamReader(res.GetResponseStream());
                 result = reader.ReadToEnd();    // json 결과 텍스트로 저장
 
-                Debug.WriteLine(result);
+                //Debug.WriteLine(result); 디버깅을 위한 코드
             }
             catch (Exception ex)
             {
@@ -157,6 +164,7 @@ namespace MovieFinder
 
             
             StsResult.Content = $"OpenAPI 조회 {movieItems.Count} 건 조회 완료";
+            //GrdResult.DataContext = movieItems;
             this.DataContext = movieItems;
         }
 

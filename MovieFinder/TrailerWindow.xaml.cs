@@ -35,6 +35,7 @@ namespace MovieFinder
             LblMovieName.Content = $"{movie.Title} 예고편";
         }
 
+        // 윈도우 로드 시
         private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
         {
             youtubeItems = new List<YoutubeItem>(); // 초기화
@@ -49,6 +50,8 @@ namespace MovieFinder
 
         private async Task LoadDataCollection()
         {
+            // https://developers.google.com/youtube/v3/code_samples/dotnet?hl=ko#search_by_keyword 참조
+
             var youtubeService = new YouTubeService(
                 new BaseClientService.Initializer()
                 {
@@ -67,7 +70,7 @@ namespace MovieFinder
 
             foreach (var item in res.Items)
             {
-                Debug.WriteLine(item.Snippet.Title);
+                //Debug.WriteLine(item.Snippet.Title);
                 if (item.Id.Kind.Equals("youtube#video"))   // youtube#video만 동영상 플레이 가능
                 {
                     YoutubeItem youtube = new YoutubeItem()

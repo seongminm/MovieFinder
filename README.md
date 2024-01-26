@@ -8,9 +8,9 @@ TMDB, Youtube OpenAPI를 활용한 영화, 예고편 검색 애플리케이션�
 ## 소개
 </br>
 
-<img src="https://github.com/seongminm/MovieFinder/assets/131761210/090e56f6-521d-4772-85be-131759eea807" width="600"/>
-<img src="https://github.com/seongminm/MovieFinder/assets/131761210/bba40a1a-0481-429f-aaba-ced50de31afd" width="600"/>
-<img src="https://github.com/seongminm/MovieFinder/assets/131761210/d5ccc7d8-22ea-495b-8a84-05793b0a3107" width="600"/>
+<img src="https://github.com/seongminm/MovieFinder/assets/131761210/090e56f6-521d-4772-85be-131759eea807" width="1000"/>
+<img src="https://github.com/seongminm/MovieFinder/assets/131761210/bba40a1a-0481-429f-aaba-ced50de31afd" width="1000"/>
+<img src="https://github.com/seongminm/MovieFinder/assets/131761210/d5ccc7d8-22ea-495b-8a84-05793b0a3107" width="1000"/>
 
 > 
 </br>

@@ -6,6 +6,7 @@ using MovieFinder.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -75,12 +76,13 @@ namespace MovieFinder
                 {
                     YoutubeItem youtube = new YoutubeItem()
                     {
-                        Title = item.Snippet.Title,
+                        Title = WebUtility.HtmlDecode(item.Snippet.Title),
+                        //Title = item.Snippet.Title,
                         ChannelTitle = item.Snippet.ChannelTitle,
                         URL = $"https://www.youtube.com/watch?v={item.Id.VideoId}", // 유튜브 플레이 링크
                         //Author = item.Snippet.ChannelTitle
                     };
-
+                 
                     youtube.Thumbnail = new BitmapImage(new Uri(item.Snippet.Thumbnails.Default__.Url, UriKind.RelativeOrAbsolute));
                     youtubeItems.Add(youtube);
 
@@ -88,6 +90,7 @@ namespace MovieFinder
             }
         }
 
+        // 목록 더블 클릭 시 
         private void LsvResult_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (LsvResult.SelectedItem is YoutubeItem)

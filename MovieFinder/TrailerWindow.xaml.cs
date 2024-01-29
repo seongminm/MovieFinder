@@ -76,6 +76,7 @@ namespace MovieFinder
                 {
                     YoutubeItem youtube = new YoutubeItem()
                     {
+                        // HTML 엔티티 표현을 제거하기 위한 디코딩
                         Title = WebUtility.HtmlDecode(item.Snippet.Title),
                         //Title = item.Snippet.Title,
                         ChannelTitle = item.Snippet.ChannelTitle,

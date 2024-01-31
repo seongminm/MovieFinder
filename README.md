@@ -5,15 +5,16 @@
 
 ## 실행화면
 
-![TMDB_API](https://github.com/seongminm/MovieFinder/assets/131761210/4a9b5837-0015-4f62-a929-de9c33c5c76c)
-![Youtube_API](https://github.com/seongminm/MovieFinder/assets/131761210/3eefc909-466a-481a-a67b-38b9544b80ff)
+![TMDB_API](https://github.com/seongminm/MovieFinder/assets/131761210/5b1a606d-1663-41bd-8a0a-792ab825129a)
 </br></br>
 ---
 # 주요 소스 코드
 
 ## TMDB API 접근
+<details>
+<summary>MainWindow.xaml.cs</summary>
+
 ```C#
-// MainWindow.xaml.cs
 
         // TMDB API를 통한 영화검색
         private async void SearchMovie(string movieName)
@@ -96,9 +97,11 @@
             this.DataContext = movieItems;
         }
 ```
+</details>
 </br>
 
-- API 호출을 통한 결과물
+<details>
+<summary> API 호출 결과</summary>
 
 ```json
 ﻿{
@@ -141,14 +144,18 @@
   "total_results": 46
 }
 ```
+</detailes>
+
 </br></br>
 ---
 
 ## Youtube API 접근 
 - https://developers.google.com/youtube/v3/code_samples/dotnet?hl=ko#search_by_keyword 참조
+![Youtube_API](https://github.com/seongminm/MovieFinder/assets/131761210/7e3f0620-6985-4e16-9e68-f237cef613d3)
 
+<details>
+<summary>TrailerWindow.xaml.cs</summary>
 ```C#
-// TrailerWindow.xaml.cs
 
         private async Task LoadDataCollection()
         {
@@ -201,6 +208,7 @@
 <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Margin="10" Background="Gainsboro">
             <cefSharp:ChromiumWebBrowser x:Name="BrsYoutube" Address=""/>
 ```
+</details>
 ```C#
 // TrailerWindow.xaml.cs
 

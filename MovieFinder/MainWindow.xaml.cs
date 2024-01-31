@@ -4,12 +4,15 @@ using MovieFinder.Models;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Web;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
@@ -39,7 +42,7 @@ namespace MovieFinder
                 BtnSearchMovie_Click(sender, e); // BtnSearchMovie_Click를 거치는 이유는 예외 처리를 재사용하기 위함
             }
         }
-        
+
         // 검색 버튼 클릭 시 검색 메서드 호출
         private async void BtnSearchMovie_Click(object sender, RoutedEventArgs e)
         {
@@ -54,9 +57,9 @@ namespace MovieFinder
             }
             catch (Exception ex)
             {
-                 await Commons.ShowMessageAsync("오류", $"※오류 발생 : {ex.Message}");
+                await Commons.ShowMessageAsync("오류", $"※오류 발생 : {ex.Message}");
             }
-            
+
         }
 
         // 그리드의 셀을 선택하거나 변경할 경우
@@ -69,6 +72,10 @@ namespace MovieFinder
                 if (GrdResult.SelectedItem is MovieItem)
                 {
                     var movie = GrdResult.SelectedItem as MovieItem;
+                    posterPath = movie.Poster_Path;
+                } else if(GrdResult.SelectedItem is FavoriteMovieItem)
+                {
+                    var movie = GrdResult.SelectedItem as FavoriteMovieItem;
                     posterPath = movie.Poster_Path;
                 }
 
@@ -92,7 +99,7 @@ namespace MovieFinder
         private async void SearchMovie(string movieName)
         {
             string tmdb_apiKey = Environment.GetEnvironmentVariable("TMDB_API");
-            if(tmdb_apiKey == null)
+            if (tmdb_apiKey == null)
             {
                 await Commons.ShowMessageAsync("TMDB API", "인증키가 필요합니다");
                 return;
@@ -102,10 +109,10 @@ namespace MovieFinder
              * 명시적인 인코딩 과정을 통해 모든 상황에서 안전한 전송을 보장하기 위한 좋은 습관
              */
             string encoding_movieName = HttpUtility.UrlEncode(movieName, Encoding.UTF8);
-            
+
 
             string openApiUrl = $@"https://api.themoviedb.org/3/search/movie?api_key={tmdb_apiKey}&language=ko-KR&page=1&include_adult=false&query={encoding_movieName}";
-           
+
             string result = string.Empty;   // 결과값
 
             // api 실행할 객체
@@ -162,7 +169,7 @@ namespace MovieFinder
                 movieItems.Add(MovieItem);
             }
 
-            
+
             StsResult.Content = $"OpenAPI 조회 {movieItems.Count} 건 조회 완료";
             //GrdResult.DataContext = movieItems;
             this.DataContext = movieItems;
@@ -171,7 +178,7 @@ namespace MovieFinder
         // 예고편 보기 클릭
         private async void BtnWatchTrailer_Click(object sender, RoutedEventArgs e)
         {
-            if(GrdResult.SelectedItems.Count == 0)
+            if (GrdResult.SelectedItems.Count == 0)
             {
                 await Commons.ShowMessageAsync("유튜브", "영화를 선택하세요");
                 return;
@@ -197,6 +204,66 @@ namespace MovieFinder
             trailerWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner; // 부모창의 정중앙에 위치
             // trailerWindow.Show(); // 모달리스로 창을 열면 부모창을 손댈 수 있기 때문에
             trailerWindow.ShowDialog(); // 모달창
+        }
+
+        // 즐겨찾기 보기
+        private void BtnStateView_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(Commons.msSql_String))
+                {
+                    if (conn.State == ConnectionState.Closed) conn.Open();
+
+                    var query = @"SELECT Id
+                                      , Title
+                                      , Original_Title
+                                      , Release_Date
+                                      , Original_Language
+                                      , Adult
+                                      , Popularity
+                                      , Vote_Average
+                                      , Poster_Path
+                                      , Overview
+                                      , Reg_Date
+                                  FROM FavoriteMovieItem
+                                 ORDER BY Id ASC";
+                    var cmd = new SqlCommand(query, conn); // SqlCommand, SQL의 명령문을 나타냄
+                    var adapter = new SqlDataAdapter(cmd); // 데이터베이스와 데이터를 주고받기 위한 중간 계층 역할
+                    var dataSet = new DataSet(); // 메모리상의 간이 데이터베이스와 같은 개념
+                                                 // dataSet.Tables[0]과 같이 인덱스를 사용할 수 있으며 
+                                                 // dataSet.Tables["Tab1"] 과 같이 엑세스할 수 있음
+                    adapter.Fill(dataSet, "TableName");
+
+
+                    var favoriteMovieItem = new List<FavoriteMovieItem>();
+                    // var dset 일 경우 오류 발생
+                    foreach (DataRow dset in dataSet.Tables["TableName"].Rows)
+                    {
+                        var FavoriteMovieItem = new FavoriteMovieItem
+                        {
+                            Id = Convert.ToInt32(dset["id"]),
+                            Title = Convert.ToString(dset["title"]),
+                            Original_Title = Convert.ToString(dset["Original_Title"]),
+                            Release_Date = Convert.ToString(dset["Release_Date"]),
+                            Original_Language = Convert.ToString(dset["Original_Language"]),
+                            Adult = Convert.ToBoolean(dset["Adult"]),
+                            Popularity = Convert.ToDouble(dset["Popularity"]),
+                            Vote_Average = Convert.ToDouble(dset["Vote_Average"]),
+                            Poster_Path = Convert.ToString(dset["Poster_Path"]),
+                            Overview = Convert.ToString(dset["Overview"]),
+                            Reg_Date = Convert.ToDateTime(dset["Reg_Date"])
+                        };
+                        favoriteMovieItem.Add(FavoriteMovieItem);
+                    }
+                    this.DataContext = favoriteMovieItem;
+                    StsResult.Content = $"즐겨찾기 {favoriteMovieItem.Count} 건 조회 완료";
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
     }
 }

@@ -28,6 +28,12 @@ namespace MovieFinder.Logics
             // 하지만 ShowMessageAsync 메서드는 MetroWindow의 확장 메서드이므로 (MetroWindow)를 통한 명시적 업캐스팅
         }
 
+        public static readonly string msSql_String = "Data Source=localhost;" +
+                                                   "Initial Catalog=pknu;" + 
+                                                   "Persist Security Info=True;" +
+                                                   "User Id=sa;" + 
+                                                   "Password=1234;";
+
 
     }
 }

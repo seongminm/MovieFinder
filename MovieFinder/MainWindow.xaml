@@ -87,6 +87,17 @@
 
         <!--버튼 영역-->
         <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+            <Button x:Name="BtnStateView" Content="즐겨찾기 보기" FontSize="12"
+                    Style="{StaticResource MahApps.Styles.Button.Flat}" Margin="5,15" Click="BtnStateView_Click" >
+                <Button.ContentTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <iconPacks:PackIconOcticons Kind="Pin" Margin="5"/>
+                            <TextBlock Text="{Binding}" Margin="5"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Button.ContentTemplate>
+            </Button>
             
             <Button x:Name="BtnWatchTrailer" Content="예고편 보기" FontSize="12" 
                     Style="{StaticResource MahApps.Styles.Button.Flat}" Margin="5,15" Click="BtnWatchTrailer_Click">

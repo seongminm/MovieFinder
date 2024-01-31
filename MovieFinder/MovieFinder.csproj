@@ -204,6 +204,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\FavoriteMovieItem.cs" />
     <Compile Include="Models\YoutubeItem.cs" />
     <Compile Include="TrailerWindow.xaml.cs">
       <DependentUpon>TrailerWindow.xaml</DependentUpon>

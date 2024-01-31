@@ -106,7 +106,7 @@ namespace MovieFinder
             BrsYoutube.Address = string.Empty;  // 웹브라우저 주소 클리어
             BrsYoutube.Dispose();   // 리소스 해제
         }
-
+        
 
     }
 }

@@ -1,6 +1,8 @@
 # MovieFinder
+ - MahApps 오픈 소스 UI 라이브러리 적용 
  - TMDB API를 사용하여 영화의 개봉일, 인기도, 평점 포스터를 불러올 수 있도록 구현
  - Youtube API를 사용하여 해당 영화의 티저 재생 구현
+ - DB와 연동하여 즐겨찾기 CRUD 구현
 ---
 
 ## 실행화면
@@ -152,6 +154,7 @@
 
 ## Youtube API 접근 
 - https://developers.google.com/youtube/v3/code_samples/dotnet?hl=ko#search_by_keyword 참조 </br></br>
+
 ![Youtube_API](https://github.com/seongminm/MovieFinder/assets/131761210/7e3f0620-6985-4e16-9e68-f237cef613d3)
 
 <details>
@@ -226,6 +229,234 @@
 ```
 </details>
 </br>
+
+---
+
+## 즐겨찾기 CRUD 
+![즐겨찾기추가](https://github.com/seongminm/MovieFinder/assets/131761210/37eeebf9-8b69-4dd8-b6b5-c3d1b26241d0)
+
+<details>
+<summary>즐겨찾기 추가</summary>
+ 
+```C#
+
+        // 즐겨찾기 추가
+        private async void BtnAddFavorite_Click(object sender, RoutedEventArgs e)
+        {
+            if(GrdResult.SelectedItems.Count == 0)
+            {
+                await Commons.ShowMessageAsync("오류", "즐겨찾기에 추가할 영화를 선택하세요(복수선택 가능).");
+                return;
+            }
+            if(isFavorite)
+            {
+                // 즐겨찾기 모드일 경우
+                await Commons.ShowMessageAsync("오류", "이미 즐겨찾기한 영화입니다.");
+                return;
+            }
+
+            try
+            {
+                using(SqlConnection conn = new SqlConnection(Commons.msSql_String))
+                {
+                    if (conn.State == ConnectionState.Closed) conn.Open();
+
+                    var query = @"INSERT INTO [dbo].[FavoriteMovieItem]
+                                               ([Id]
+                                               ,[Title]
+                                               ,[Original_Title]
+                                               ,[Release_Date]
+                                               ,[Original_Language]
+                                               ,[Adult]
+                                               ,[Popularity]
+                                               ,[Vote_Average]
+                                               ,[Poster_Path]
+                                               ,[Overview]
+                                               ,[Reg_Date])
+                                         VALUES
+                                               (@Id
+                                               ,@Title
+                                               ,@Original_Title
+                                               ,@Release_Date
+                                               ,@Original_Language
+                                               ,@Adult
+                                               ,@Popularity
+                                               ,@Vote_Average
+                                               ,@Poster_Path
+                                               ,@Overview
+                                               ,@Reg_Date)";
+                    int count = 0;
+                    foreach (MovieItem item in GrdResult.SelectedItems)  // openAPI로 조회된 결과 -> MovieItem
+                    {
+                        SqlCommand cmd = new SqlCommand(query, conn);
+
+                        cmd.Parameters.AddWithValue("@Id", item.Id);
+                        cmd.Parameters.AddWithValue("@Title", item.Title);
+                        cmd.Parameters.AddWithValue("@Original_Title", item.Original_Title);
+                        cmd.Parameters.AddWithValue("@Release_Date", item.Release_Date);
+                        cmd.Parameters.AddWithValue("@Original_Language", item.Original_Language);
+                        cmd.Parameters.AddWithValue("@Adult", item.Adult);
+                        cmd.Parameters.AddWithValue("@Popularity", item.Popularity);
+                        cmd.Parameters.AddWithValue("@Vote_Average", item.Vote_Average);
+                        cmd.Parameters.AddWithValue("@Poster_Path", item.Poster_Path);
+                        cmd.Parameters.AddWithValue("@Overview", item.Overview);
+                        cmd.Parameters.AddWithValue("@Reg_Date", DateTime.Now);
+
+                        cmd.ExecuteNonQuery();
+                        count++;
+                    }
+
+                    await Commons.ShowMessageAsync("즐겨찾기", "즐겨찾기 저장 완료");
+                    StsResult.Content = $"즐겨찾기 {count} 건 저장 완료";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                await Commons.ShowMessageAsync("오류", $"DB 저장 오류 : {ex.Message}");
+            }
+        }
+
+```
+</details>
+</br>
+
+
+![즐겨찾기보기](https://github.com/seongminm/MovieFinder/assets/131761210/596460f1-e545-4788-8ea5-f7db81f32ae3)
+
+<details>
+<summary>즐겨찾기 보기</summary>
+ 
+```C#
+
+// 즐겨찾기 보기
+        private async void BtnStateView_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                /* using문 사용 이유
+                 * using문은 블록을 나갈 때 자동으로 Dispose 메서드를 호출하여 자원을 해제
+                 * 명시적인 자원 관리는(파일 핸들, 네트워크 연결, 데이터베이스 연결 등)에서 중요
+                 * 특히 데이터베이스 연결과 같은 리소스는 제한된 수의 연결을 가지고 있을 수 있으며, 
+                 * 이러한 연결한 오랫동안 열어두는 것은 성능 문제를 일으킬 수 있음
+                 */
+                using (SqlConnection conn = new SqlConnection(Commons.msSql_String))
+                {
+                    if (conn.State == ConnectionState.Closed) conn.Open();
+
+                    var query = @"SELECT Id
+                                      , Title
+                                      , Original_Title
+                                      , Release_Date
+                                      , Original_Language
+                                      , Adult
+                                      , Popularity
+                                      , Vote_Average
+                                      , Poster_Path
+                                      , Overview
+                                      , Reg_Date
+                                  FROM FavoriteMovieItem
+                                 ORDER BY Id ASC";
+                    var cmd = new SqlCommand(query, conn); // SqlCommand, SQL의 명령문을 나타냄
+                    var adapter = new SqlDataAdapter(cmd); // 데이터베이스와 데이터를 주고받기 위한 중간 계층 역할
+                    var dataSet = new DataSet(); // 메모리상의 간이 데이터베이스와 같은 개념
+                                                 // dataSet.Tables[0]과 같이 인덱스를 사용할 수 있으며 
+                                                 // dataSet.Tables["Tab1"] 과 같이 엑세스할 수 있음
+                    adapter.Fill(dataSet, "TableName");
+
+
+                    var favoriteMovieItem = new List<FavoriteMovieItem>();
+                    // var dset 일 경우 오류 발생
+                    foreach (DataRow dset in dataSet.Tables["TableName"].Rows)
+                    {
+                        var FavoriteMovieItem = new FavoriteMovieItem
+                        {
+                            Id = Convert.ToInt32(dset["id"]),
+                            Title = Convert.ToString(dset["title"]),
+                            Original_Title = Convert.ToString(dset["Original_Title"]),
+                            Release_Date = Convert.ToString(dset["Release_Date"]),
+                            Original_Language = Convert.ToString(dset["Original_Language"]),
+                            Adult = Convert.ToBoolean(dset["Adult"]),
+                            Popularity = Convert.ToDouble(dset["Popularity"]),
+                            Vote_Average = Convert.ToDouble(dset["Vote_Average"]),
+                            Poster_Path = Convert.ToString(dset["Poster_Path"]),
+                            Overview = Convert.ToString(dset["Overview"]),
+                            Reg_Date = Convert.ToDateTime(dset["Reg_Date"])
+                        };
+                        favoriteMovieItem.Add(FavoriteMovieItem);
+                    }
+                    this.DataContext = favoriteMovieItem;
+                    StsResult.Content = $"즐겨찾기 {favoriteMovieItem.Count} 건 조회 완료";
+                    isFavorite = true;
+                    TxtMovieName.Text = "";
+                }
+            }
+            catch (Exception ex)
+            {   
+                await Commons.ShowMessageAsync("오류", $"DB조회 오류 {ex.Message}");
+            }
+        }
+
+```
+</details>
+</br>
+
+![즐겨찾기삭제](https://github.com/seongminm/MovieFinder/assets/131761210/851684a제</summary>
+ 
+```C#
+
+        // 즐겨찾기 제거
+        private async void BtnDeleteFavorite_Click(object sender, RoutedEventArgs e)
+        {
+            if (isFavorite == false)
+            {
+                await Commons.ShowMessageAsync("오류", "즐겨찾기만 삭제할 수 있습니다.");
+                return;
+            }
+
+            if (GrdResult.SelectedItems.Count == 0)
+            {
+                await Commons.ShowMessageAsync("오류", "삭재할 영화를 선택하시오.");
+                return;
+            }
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(Commons.msSql_String))
+                {
+                    if (conn.State == ConnectionState.Closed) { conn.Open(); }
+
+                    var query = @"DELETE FROM FavoriteMovieItem WHERE Id=@Id";
+                    var count = 0;
+
+                    foreach (FavoriteMovieItem item in GrdResult.SelectedItems)
+                    {
+                        SqlCommand cmd = new SqlCommand(query, conn);
+                        cmd.Parameters.AddWithValue("@Id", item.Id);
+
+                        cmd.ExecuteNonQuery();
+                        count++;
+                    }
+
+                     await Commons.ShowMessageAsync("삭제", $"{count}건 즐겨찾기 삭제");
+                     StsResult.Content = $"즐겨찾기 {count} 건 삭제 완료";
+
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                await Commons.ShowMessageAsync("오류", $"DB삭제 오류 {ex.Message}");
+            }
+
+            BtnStateView_Click(sender, e);    // 삭제 후 즐겨찾기 보기 이벤트 핸들러 실행
+        }
+    
+```
+</details>
+</br>
+
+
 
 ---
 

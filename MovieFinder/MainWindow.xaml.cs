@@ -218,6 +218,12 @@ namespace MovieFinder
         {
             try
             {
+                /* using문 사용 이유
+                 * using문은 블록을 나갈 때 자동으로 Dispose 메서드를 호출하여 자원을 해제
+                 * 명시적인 자원 관리는(파일 핸들, 네트워크 연결, 데이터베이스 연결 등)에서 중요
+                 * 특히 데이터베이스 연결과 같은 리소스는 제한된 수의 연결을 가지고 있을 수 있으며, 
+                 * 이러한 연결한 오랫동안 열어두는 것은 성능 문제를 일으킬 수 있음
+                 */
                 using (SqlConnection conn = new SqlConnection(Commons.msSql_String))
                 {
                     if (conn.State == ConnectionState.Closed) conn.Open();

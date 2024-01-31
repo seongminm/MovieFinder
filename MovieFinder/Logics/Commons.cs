@@ -29,7 +29,7 @@ namespace MovieFinder.Logics
         }
 
         public static readonly string msSql_String = "Data Source=localhost;" +
-                                                   "Initial Catalog=pknu;" + 
+                                                   "Initial Catalog=MyDatabase;" + 
                                                    "Persist Security Info=True;" +
                                                    "User Id=sa;" + 
                                                    "Password=1234;";

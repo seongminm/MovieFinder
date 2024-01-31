@@ -401,7 +401,10 @@
 </details>
 </br>
 
-![즐겨찾기삭제](https://github.com/seongminm/MovieFinder/assets/131761210/851684a제</summary>
+![즐겨찾기삭제](https://github.com/seongminm/MovieFinder/assets/131761210/c97cc646-c8fb-4acd-aac8-274f58615178)
+
+<details>
+<summary>즐겨찾기 삭제</summary> 
  
 ```C#
 
@@ -453,6 +456,7 @@
         }
     
 ```
+
 </details>
 </br>
 

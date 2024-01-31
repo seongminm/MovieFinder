@@ -98,6 +98,7 @@
         }
 ```
 </details>
+
 </br>
 
 <details>
@@ -144,17 +145,18 @@
   "total_results": 46
 }
 ```
-</detailes>
+</details>
+</br>
 
-</br></br>
 ---
 
 ## Youtube API 접근 
-- https://developers.google.com/youtube/v3/code_samples/dotnet?hl=ko#search_by_keyword 참조
+- https://developers.google.com/youtube/v3/code_samples/dotnet?hl=ko#search_by_keyword 참조 </br></br>
 ![Youtube_API](https://github.com/seongminm/MovieFinder/assets/131761210/7e3f0620-6985-4e16-9e68-f237cef613d3)
 
 <details>
 <summary>TrailerWindow.xaml.cs</summary>
+ 
 ```C#
 
         private async Task LoadDataCollection()
@@ -198,17 +200,18 @@
             }
         }
 ```
-</br></br>
+</details>
+</br>
 
-- CefSharp을 통해 크롬 브라우저 사용
-  
+<details>
+<summary> CefSharp을 통해 크롬 브라우저 사용 TrailerWindow.xaml</summary>
+ 
 ```XAML
-// TrailerWindow.xaml
 
 <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Margin="10" Background="Gainsboro">
             <cefSharp:ChromiumWebBrowser x:Name="BrsYoutube" Address=""/>
 ```
-</details>
+
 ```C#
 // TrailerWindow.xaml.cs
 
@@ -221,7 +224,9 @@
             }
         }
 ```
-</br></br>
+</details>
+</br>
+
 ---
 
 # 개발환경
